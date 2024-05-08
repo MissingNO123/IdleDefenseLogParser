@@ -11,6 +11,7 @@ parser.add_argument("-l", "--log_directory", help="Directory of the log files", 
 parser.add_argument("-v", "--verbose", help="Enable verbose output", action="store_true")
 args = parser.parse_args()
 
+
 class LogWatcher:
     def __init__(self, log_directory=None):
         self.vrc_is_running = False
@@ -125,7 +126,11 @@ class LogWatcher:
 class Popup_YesNo(customtkinter.CTkToplevel):
     def __init__(self, master, window_title, window_text, button_confirm_text, button_deny_text, button_confirm_command=None, button_deny_command=None):
         super().__init__(None)
-        self.geometry("400x150")
+        w = 400
+        h = 150
+        #spawn the window centered within the parent window
+        x = master.winfo_x() + (master.winfo_width() // 2) - (w // 2)
+        y = master.winfo_y() + (master.winfo_height() // 2) - (h // 2)
         self.grid_columnconfigure((0,1), weight=1)
         self.grid_rowconfigure(1, weight=1)
         self.grid_rowconfigure((0,2), weight=0)
@@ -147,6 +152,7 @@ class Popup_YesNo(customtkinter.CTkToplevel):
         self.button.grid(row=2, column=1, sticky="sew", padx=(5,10), pady=(2,10))
 
         self.protocol("WM_DELETE_WINDOW",  self.on_close)
+        self.geometry(f"{w}x{h}+{x}+{y}")
 
     def _ok_button_pressed(self):
         if self.button_confirm_command:
@@ -201,7 +207,6 @@ class App(customtkinter.CTk):
         self.button_refresh_save_code = customtkinter.CTkButton(self, text="Refresh", fg_color="#218ADE", hover_color="#1b6eb1", command=self.refresh_save_code)
         self.button_refresh_save_code.grid(row=row, column=0, sticky="ew", padx=(10,5), pady=(2,10))
 
-
         self.button_spawn_chat_box = customtkinter.CTkButton(self, text="Copy", command=self._copy_to_clipboard)
         self.button_spawn_chat_box.grid(row=row, column=1, sticky="ew", padx=(5,10), pady=(2,10))
         row += 1
@@ -217,7 +222,7 @@ class App(customtkinter.CTk):
                             window_text=f"A disconnect from VRChat has been detected. Would you like to copy the last code saved before you disconnected?\nTimestamp: {self.dc_timestamp}", 
                             button_confirm_text="Copy", 
                             button_deny_text="Nope", 
-                            button_confirm_command=self._copy_to_clipboard, 
+                            button_confirm_command=self._copy_to_clipboard_dc, 
                             button_deny_command=self._stop_showing_disconnect_popup )
             self.popup.after(250, self.popup.focus) # Why do I need to wait for this???
         if (self.timestamp is not None):
@@ -229,11 +234,17 @@ class App(customtkinter.CTk):
     
     def _stop_showing_disconnect_popup(self):
         self.show_disconnect_popup = False
-        pass
 
-    def _copy_to_clipboard(self):
+    def _copy_to_clipboard_dc(self):
+        self._stop_showing_disconnect_popup()
+        self._copy_to_clipboard(dc=True)
+
+    def _copy_to_clipboard(self, dc=False):
         self.clipboard_clear()
-        self.clipboard_append(self.save_code.get())
+        if dc:
+            self.clipboard_append(self.dc_save_code)
+        else:
+            self.clipboard_append(self.save_code.get())
         self.update()
         self.update_idletasks()
         self.after(100, self._show_copy_confirmation)
@@ -249,7 +260,6 @@ class App(customtkinter.CTk):
 
     def on_close(self):
         self.destroy()
-
 
 app: App = None
 
