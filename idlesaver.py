@@ -234,7 +234,7 @@ class App(customtkinter.CTk):
     
     def _stop_showing_disconnect_popup(self):
         self.show_disconnect_popup = False
-
+ 
     def _copy_to_clipboard_dc(self):
         self._stop_showing_disconnect_popup()
         self._copy_to_clipboard(dc=True)

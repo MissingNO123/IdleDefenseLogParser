@@ -3,6 +3,6 @@ from Cython.Build import cythonize
 
 setup(
     name="Idle Defense Save Finder",
-    version='0.300',
+    version='1.0.0',
     ext_modules = cythonize("idlesaver.py")
 )
