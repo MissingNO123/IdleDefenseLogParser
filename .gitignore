@@ -1,0 +1,15 @@
+/.vscode
+/after_tower.bin
+/avatar_id_finder.py
+/before_tower.bin
+/build
+/dist
+/idlesaver.c
+/idlesaver.cp311-win_amd64.pyd
+/idlesaver.spec
+/version.txt
+/wave_702.bin
+/wave_703.bin
+/wave_706_1.bin
+/wave_706_2.bin
+/__pycache__
